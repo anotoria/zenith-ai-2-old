@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 import type { ProfileWithPermissions } from '@/lib/types';
+import type { TablesUpdate } from '@/integrations/supabase/types';
 
 export const useProfile = () => {
   const { user } = useAuth();
@@ -29,7 +30,7 @@ export const useProfile = () => {
   });
 
   const updateProfile = useMutation({
-    mutationFn: async (updates: any) => {
+    mutationFn: async (updates: TablesUpdate<'profiles'>) => {
       if (!user) throw new Error('Not authenticated');
 
       const { data, error } = await supabase
