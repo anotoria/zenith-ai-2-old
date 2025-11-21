@@ -1,6 +1,7 @@
 import React from 'react';
 import { Menu, Bell, User } from 'lucide-react';
 import { useProfile } from '@/hooks/useProfile';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 interface AppHeaderProps {
   onMenuClick: () => void;
@@ -21,6 +22,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ onMenuClick }) => {
       <div className="flex-1" />
 
       <div className="flex items-center space-x-4">
+        <ThemeToggle />
+        
         <button className="text-muted-foreground hover:text-foreground relative">
           <Bell className="w-5 h-5" />
           <span className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full" />
