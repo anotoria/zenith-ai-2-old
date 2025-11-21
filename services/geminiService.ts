@@ -205,9 +205,15 @@ export const generateCustomCopy = async (
     count: number, 
     title?: string
 ): Promise<string[]> => {
+    let specializedInstruction = "";
+    if (type === "E-mail Marketing") {
+        specializedInstruction = "IMPORTANTE: Para E-mail Marketing, inclua obrigatoriamente um 'Assunto:' chamativo e relevante antes do corpo do e-mail.";
+    }
+
     const prompt = `Atue como um Copywriter profissional.
     Objetivo: Criar ${count} variações de texto do tipo "${type}".
     Método de Copywriting obrigatório a seguir: ${method}.
+    ${specializedInstruction}
     
     Ideia Principal: ${idea}
     Descrição Detalhada: ${description}

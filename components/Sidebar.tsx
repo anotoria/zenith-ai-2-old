@@ -70,6 +70,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setView, currentU
             {currentUser.permissions.canAccessArticles && (
               <NavItem icon={ArticleIcon} label="Artigos do Blog" view="articles" currentView={currentView} setView={setView} />
             )}
+
+            {/* REORDERED: Auto-Post History moved here */}
+            <NavItem icon={HistoryIcon} label="Histórico de Auto-Posts" view="auto-posts" currentView={currentView} setView={setView} />
             
             {currentUser.permissions.canAccessPlanner && (
               <NavItem icon={PlannerIcon} label="Social Planner" view="planner" currentView={currentView} setView={setView} />
@@ -81,8 +84,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setView, currentU
 
             <NavItem icon={LibraryIcon} label="Minha Biblioteca" view="saved-content" currentView={currentView} setView={setView} />
             
-            <NavItem icon={HistoryIcon} label="Histórico de Auto-Posts" view="auto-posts" currentView={currentView} setView={setView} />
-
             <NavItem icon={LearningIcon} label="Trilhas de Aprendizagem" view="learning" currentView={currentView} setView={setView} />
             
             {currentUser.role === Role.ADMIN && currentUser.permissions.canManageUsers && (

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { IMAGE_TYPES, VIDEO_TYPES, COPY_TYPES, COPY_METHODS } from '../constants';
 import { generateCustomImage, generateCustomVideo, generateCustomCopy } from '../services/geminiService';
@@ -36,6 +35,7 @@ export const AICreator: React.FC<AICreatorProps> = ({ onSaveItem }) => {
     const [vidType, setVidType] = useState(VIDEO_TYPES[0]);
     const [vidDetails, setVidDetails] = useState('');
     const [generatedVideoUrl, setGeneratedVideoUrl] = useState<string | null>(null);
+    const [isVideoPreviewOpen, setIsVideoPreviewOpen] = useState(false);
 
     // --- Copy State ---
     const [copyIdea, setCopyIdea] = useState('');
@@ -89,6 +89,7 @@ export const AICreator: React.FC<AICreatorProps> = ({ onSaveItem }) => {
         setError(null);
         setNeedsApiKey(false);
         setIsGenerating(true);
+        setEditingCopyIndex(null); // Reset editing state on new generation
         try {
             const results = await generateCustomCopy(copyIdea, copyDesc, copyType, copyMethod, copyCount, copyTitle);
             setGeneratedCopies(results);
@@ -338,6 +339,12 @@ export const AICreator: React.FC<AICreatorProps> = ({ onSaveItem }) => {
                             <div className="w-full space-y-4">
                                 <video src={generatedVideoUrl} controls className="w-full rounded-lg border border-border" />
                                 <div className="flex flex-col sm:flex-row gap-3">
+                                     <button 
+                                        onClick={() => setIsVideoPreviewOpen(true)} 
+                                        className="flex-1 bg-background hover:bg-border text-text-primary py-2 rounded-lg border border-border transition-colors text-sm font-medium"
+                                    >
+                                        Visualização Rápida
+                                    </button>
                                     <button onClick={() => copyToClipboard(`Video prompt: ${vidIdea} - ${vidDesc}`)} className="flex-1 bg-background hover:bg-border text-text-primary py-2 rounded-lg border border-border transition-colors text-sm font-medium">
                                         Copiar Prompt
                                     </button>
@@ -362,6 +369,21 @@ export const AICreator: React.FC<AICreatorProps> = ({ onSaveItem }) => {
                          )}
                     </div>
                  </div>
+            )}
+
+             {/* Video Quick View Modal */}
+             {isVideoPreviewOpen && generatedVideoUrl && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4" onClick={() => setIsVideoPreviewOpen(false)}>
+                     <div className="relative w-full max-w-4xl" onClick={e => e.stopPropagation()}>
+                        <button
+                            onClick={() => setIsVideoPreviewOpen(false)}
+                            className="absolute -top-8 right-0 text-white hover:text-gray-300 font-medium text-sm"
+                        >
+                            Fechar
+                        </button>
+                        <video src={generatedVideoUrl} controls autoPlay className="w-full rounded-lg shadow-2xl border border-border" />
+                     </div>
+                </div>
             )}
 
             {/* COPY GENERATOR */}
@@ -455,12 +477,26 @@ export const AICreator: React.FC<AICreatorProps> = ({ onSaveItem }) => {
                                         <div className="flex flex-wrap justify-between items-center mb-2 gap-2">
                                             <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded">Variação {idx + 1}</span>
                                             <div className="flex gap-2">
-                                                <button onClick={() => handleSave(SavedItemType.COPY, copy, `${copyIdea} - ${copyType}`, `Método: ${copyMethod}`)} className="text-xs text-text-secondary hover:text-primary flex items-center">
+                                                <button 
+                                                    onClick={() => handleSave(SavedItemType.COPY, copy, `${copyIdea} - ${copyType}`, `Método: ${copyMethod}`)} 
+                                                    className="text-xs text-text-secondary hover:text-primary flex items-center"
+                                                    title="Salvar na Biblioteca"
+                                                >
                                                     <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path></svg>
                                                     Salvar
                                                 </button>
-                                                 <button onClick={() => setEditingCopyIndex(idx === editingCopyIndex ? null : idx)} className="text-xs text-text-secondary hover:text-text-primary">
-                                                    {editingCopyIndex === idx ? 'Parar Edição' : 'Editar'}
+                                                 <button 
+                                                    onClick={() => setEditingCopyIndex(idx === editingCopyIndex ? null : idx)} 
+                                                    className={`text-xs flex items-center ${editingCopyIndex === idx ? 'text-green-400 font-bold bg-green-400/10 px-2 py-0.5 rounded' : 'text-text-secondary hover:text-text-primary'}`}
+                                                >
+                                                    {editingCopyIndex === idx ? (
+                                                        <>
+                                                            <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                                                            Concluir
+                                                        </>
+                                                    ) : (
+                                                        'Editar'
+                                                    )}
                                                 </button>
                                                 <button onClick={() => copyToClipboard(copy)} className="text-xs text-text-secondary hover:text-text-primary flex items-center">
                                                     <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
@@ -477,13 +513,17 @@ export const AICreator: React.FC<AICreatorProps> = ({ onSaveItem }) => {
                                                     newCopies[idx] = e.target.value;
                                                     setGeneratedCopies(newCopies);
                                                 }}
-                                                className="w-full bg-surface border border-border rounded p-2 text-sm h-32 focus:border-primary outline-none"
+                                                className="w-full bg-surface border border-primary rounded p-3 text-sm h-48 focus:ring-2 focus:ring-primary outline-none resize-none"
+                                                autoFocus
                                             />
-                                            <div className="text-right text-xs text-text-secondary mt-1">{copy.length} caracteres</div>
+                                            <div className="flex justify-between items-center mt-1">
+                                                <span className="text-xs text-primary animate-pulse">Editando...</span>
+                                                <div className="text-right text-xs text-text-secondary">{copy.length} caracteres</div>
+                                            </div>
                                             </>
                                         ) : (
                                             <>
-                                            <p className="text-sm text-text-secondary whitespace-pre-wrap">{copy}</p>
+                                            <p className="text-sm text-text-secondary whitespace-pre-wrap leading-relaxed">{copy}</p>
                                             <div className="text-right text-xs text-text-secondary mt-2 pt-2 border-t border-border/30 flex justify-end items-center gap-2">
                                                 <span>{copy.length} caracteres</span>
                                             </div>

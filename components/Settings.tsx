@@ -128,7 +128,7 @@ const IntegrationCard: React.FC<{
                                     <InputField 
                                         label="Senha de Aplicação (Application Password)" 
                                         type="password"
-                                        placeholder="xxxx xxxx xxxx xxxx"
+                                        placeholder="xxxx xxxx xxxx xxxx xxxx"
                                         value={profile.config?.apiKey || ''} 
                                         onChange={(v) => handleChange('apiKey', v)} 
                                     />

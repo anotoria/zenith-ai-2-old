@@ -11,10 +11,14 @@ export interface User {
   avatar: string;
   role: Role;
   isActive: boolean; // New field: Active or Inactive
+  address?: string; // Novo campo
+  whatsapp?: string; // Novo campo
   socials: {
     twitter?: string;
     linkedin?: string;
     website?: string;
+    instagram?: string; // Novo campo
+    facebook?: string; // Novo campo
   };
   permissions: {
     canManageUsers: boolean;
